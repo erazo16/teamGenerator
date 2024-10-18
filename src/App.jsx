@@ -261,7 +261,7 @@ function App() {
                 <ul style={{ listStyle : "none" }}>
                   {item.map((player) => (
                     <li style={{ marginBottom : "0.5rem"  }}>
-                      {player.name} (Nivel {player.level})
+                      {player.name} ({player.level})
                     </li>
                   ))}
                 </ul>
