@@ -1,3 +1,4 @@
+import { Input } from "antd";
 import styled from "styled-components";
 
 export const ListMembers = styled.div`
@@ -9,7 +10,7 @@ export const ListMembers = styled.div`
 `
 
 export const CardMembers = styled.div`
-    border: 1px solid ${props => props.level === "A" ? "green" : props.level === "B" ? "yellow" : "blue"};
+    border: 1px solid ${props => props.selectedPlayer ? "red" : "white" };
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,4 +40,21 @@ export const ListTeams = styled.div`
 export const CardsTeams = styled.div`
     border: 1px solid white;
     border-radius: 10px;
+`
+
+export const InputStyled = styled(Input)`
+    border-color: white;
+    background-color: #242424;
+    color: white;
+
+    &:focus {
+    border-color: #242424; 
+    box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2);
+    background-color: #242424;
+  }
+
+  &:hover{
+    background-color: #242424;
+  }
+
 `

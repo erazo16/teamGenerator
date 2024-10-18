@@ -3,7 +3,14 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { members } from "./data/data";
-import { CardAttendes, CardMembers, CardsTeams, ListMembers, ListTeams } from "./styles";
+import {
+  CardAttendes,
+  CardMembers,
+  CardsTeams,
+  ListMembers,
+  ListTeams,
+} from "./styles";
+import { ModalCreate } from "./ModalCreate";
 
 function App() {
   const [attendes, setAttendes] = useState([]);
@@ -11,6 +18,7 @@ function App() {
   const [team, setTeam] = useState([]);
   const [restr, setRestr] = useState([]);
   const [selectPlayer, setSelectPlayer] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   const addAttendes = (item) => {
     if (item.name && !attendes.some((a) => a.name === item.name)) {
@@ -42,16 +50,13 @@ function App() {
   };
 
   const teamGenerator = () => {
-
-    const totalPlayer = attendes.length
-    const numTeams = Math.floor(totalPlayer / teamSize)
+    const totalPlayer = attendes.length;
+    const numTeams = Math.floor(totalPlayer / teamSize);
 
     if (numTeams === 0) {
-      alert('No hay suficientes asistentes para formar equipos.');
+      alert("No hay suficientes asistentes para formar equipos.");
       return;
     }
-
-
 
     const levelA = attendes.filter((a) => a.level === "A");
     const levelB = attendes.filter((a) => a.level === "B");
@@ -65,15 +70,13 @@ function App() {
       if (levelC.length > 0) shuffledPlayers.push(levelC.shift());
     }
 
-
-
     let currentTeams = Array.from({ length: numTeams }, () => []);
 
     for (let i = 0; i < shuffledPlayers.length; i++) {
       currentTeams[i % numTeams].push(shuffledPlayers[i]);
     }
 
-  /*  const distributeEquitably = (players) => {
+    /*  const distributeEquitably = (players) => {
       while (players.length > 0) {
         currentTeams.forEach((team) => {
           if (players.length > 0) {
@@ -83,7 +86,7 @@ function App() {
       }
     }; */
 
-   /* const distributeEquitably = (players) => {
+    /* const distributeEquitably = (players) => {
       let teamIndex = 0;
       while (players.length > 0) {
         currentTeams[teamIndex].push(players.shift())
@@ -91,12 +94,9 @@ function App() {
       }
     }; */
 
-
-  /*  for (let i = 0; i < Math.ceil(attendes.length / teamSize); i++) {
+    /*  for (let i = 0; i < Math.ceil(attendes.length / teamSize); i++) {
       currentTeams.push([]);
     } */
-
-
 
     for (let [player1, player2] of restr) {
       for (let team of currentTeams) {
@@ -120,16 +120,17 @@ function App() {
 
     const remainingPlayers = attendes.length % teamSize;
     if (remainingPlayers > 0) {
-      alert('Algunos equipos tienen jugadores adicionales debido al número de asistentes.');
+      alert(
+        "Algunos equipos tienen jugadores adicionales debido al número de asistentes."
+      );
     }
 
     console.log("teams", currentTeams);
-    
 
     setTeam(currentTeams);
   };
 
- /* const teamGenerator = () => {
+  /* const teamGenerator = () => {
 
     const totalPlayer = attendes.length
     const numTeams = Math.floor(totalPlayer / teamSize)
@@ -215,7 +216,7 @@ function App() {
         {members.map((item, index) => (
           <CardMembers
             onClick={() => addAttendes(item)}
-            level={item.level}
+            selectedPlayer={selectPlayer.includes(item.name)}
             key={index}
           >
             {item.name}
@@ -234,7 +235,7 @@ function App() {
           >
             <h1>Asistentes</h1>
 
-            <button>Agregar</button>
+            <button onClick={()=> setShowModal(true)} >Agregar</button>
           </div>
 
           <ListMembers>
@@ -252,23 +253,25 @@ function App() {
       {team.length > 0 && (
         <>
           <h1>Equipos generados</h1>
-        <ListTeams>
-          {team.map((item, index) => (
-            <CardsTeams key={index}>
-              <h3>Equipo {index + 1}</h3>
+          <ListTeams>
+            {team.map((item, index) => (
+              <CardsTeams key={index}>
+                <h3>Equipo {index + 1}</h3>
 
-              <ul>
-                {item.map((player) => (
-                  <li>
-                    {player.name} (Nivel {player.level})
-                  </li>
-                ))}
-              </ul>
-            </CardsTeams>
-          ))}
-        </ListTeams>
+                <ul>
+                  {item.map((player) => (
+                    <li>
+                      {player.name} (Nivel {player.level})
+                    </li>
+                  ))}
+                </ul>
+              </CardsTeams>
+            ))}
+          </ListTeams>
         </>
       )}
+
+      <ModalCreate showModal={showModal} cancel={() => setShowModal(false)} addAttendes={addAttendes} />
     </>
   );
 }
