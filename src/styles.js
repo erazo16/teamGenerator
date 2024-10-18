@@ -32,14 +32,16 @@ export const CardAttendes = styled.div`
 export const ListTeams = styled.div`
     display: grid;
     gap: 1rem;
-    grid-auto-rows: 4rem;
-    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    grid-auto-rows: auto;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
     margin: 2rem 0;
 `
 
 export const CardsTeams = styled.div`
     border: 1px solid white;
     border-radius: 10px;
+    text-align: center;
+    padding: 2rem;
 `
 
 export const InputStyled = styled(Input)`

@@ -258,9 +258,9 @@ function App() {
               <CardsTeams key={index}>
                 <h3>Equipo {index + 1}</h3>
 
-                <ul>
+                <ul style={{ listStyle : "none" }}>
                   {item.map((player) => (
-                    <li>
+                    <li style={{ marginBottom : "0.5rem"  }}>
                       {player.name} (Nivel {player.level})
                     </li>
                   ))}
