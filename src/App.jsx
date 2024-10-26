@@ -7,14 +7,16 @@ import {
   CardAttendes,
   CardMembers,
   CardsTeams,
+  ContainerButtons,
   ListMembers,
   ListTeams,
 } from "./styles";
 import { ModalCreate } from "./ModalCreate";
+import { Form, Input } from "antd";
 
 function App() {
   const [attendes, setAttendes] = useState([]);
-  const [teamSize, setTeamSize] = useState(5);
+  const [teamSize, setTeamSize] = useState(6);
   const [team, setTeam] = useState([]);
   const [restr, setRestr] = useState([]);
   const [selectPlayer, setSelectPlayer] = useState([]);
@@ -50,164 +52,65 @@ function App() {
   };
 
   const teamGenerator = () => {
-    const totalPlayer = attendes.length;
-    const numTeams = Math.floor(totalPlayer / teamSize);
+    const totalTeams = Math.ceil(attendes.length / teamSize);
+    const teams = Array.from({ length: totalTeams }, () => []);
 
-    if (numTeams === 0) {
-      alert("No hay suficientes asistentes para formar equipos.");
-      return;
-    }
+    const playersByLevel = {
+        A: attendes.filter((player) => player.level === "A"),
+        B: attendes.filter((player) => player.level === "B"),
+        C: attendes.filter((player) => player.level === "C")
+    };
 
-    const levelA = attendes.filter((a) => a.level === "A");
-    const levelB = attendes.filter((a) => a.level === "B");
-    const levelC = attendes.filter((a) => a.level === "C");
+    const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
+    playersByLevel.A = shuffleArray(playersByLevel.A);
+    playersByLevel.B = shuffleArray(playersByLevel.B);
+    playersByLevel.C = shuffleArray(playersByLevel.C);
 
-    let shuffledPlayers = [];
+    const totalPlayers = attendes.length;
+    const teamSizeAdjusted = Math.ceil(totalPlayers / totalTeams); 
 
-    while (levelA.length > 0 || levelB.length > 0 || levelC.length > 0) {
-      if (levelA.length > 0) shuffledPlayers.push(levelA.shift());
-      if (levelB.length > 0) shuffledPlayers.push(levelB.shift());
-      if (levelC.length > 0) shuffledPlayers.push(levelC.shift());
-    }
-
-    let currentTeams = Array.from({ length: numTeams }, () => []);
-
-    for (let i = 0; i < shuffledPlayers.length; i++) {
-      currentTeams[i % numTeams].push(shuffledPlayers[i]);
-    }
-
-    /*  const distributeEquitably = (players) => {
-      while (players.length > 0) {
-        currentTeams.forEach((team) => {
-          if (players.length > 0) {
-            team.push(players.shift());
-          }
-        });
-      }
-    }; */
-
-    /* const distributeEquitably = (players) => {
-      let teamIndex = 0;
-      while (players.length > 0) {
-        currentTeams[teamIndex].push(players.shift())
-        teamIndex = (teamIndex + 1) % numTeams
-      }
-    }; */
-
-    /*  for (let i = 0; i < Math.ceil(attendes.length / teamSize); i++) {
-      currentTeams.push([]);
-    } */
-
-    for (let [player1, player2] of restr) {
-      for (let team of currentTeams) {
-        if (
-          team.some((p) => p.name === player1) &&
-          team.some((p) => p.name === player2)
-        ) {
-          const otherTeam = currentTeams.find(
-            (t) =>
-              !t.some((p) => p.name === player1) &&
-              !t.some((p) => p.name === player2)
-          );
-          if (otherTeam) {
-            const player2obj = team.find((a) => a.name === player2);
-            team.splice(team.indexOf(player2obj), 1);
-            otherTeam.push(player2obj);
-          }
+    const getPlayerToMove = (teams, currentTeam) => {
+        for (let i = 0; i < teams.length; i++) {
+            if (teams[i] !== currentTeam && teams[i].length > teamSizeAdjusted) {
+              
+                return teams[i].pop();
+            }
         }
-      }
-    }
+        return null; 
+    };
 
-    const remainingPlayers = attendes.length % teamSize;
-    if (remainingPlayers > 0) {
-      alert(
-        "Algunos equipos tienen jugadores adicionales debido al número de asistentes."
-      );
-    }
-
-    console.log("teams", currentTeams);
-
-    setTeam(currentTeams);
-  };
-
-  /* const teamGenerator = () => {
-
-    const totalPlayer = attendes.length
-    const numTeams = Math.floor(totalPlayer / teamSize)
-
-    if (numTeams === 0) {
-      alert('No hay suficientes asistentes para formar equipos.');
-      return;
-    }
-
-
-
-    const levelA = attendes.filter((a) => a.level === "A");
-    const levelB = attendes.filter((a) => a.level === "B");
-    const levelC = attendes.filter((a) => a.level === "C");
-
-
-
-    let currentTeams = Array.from({ length: numTeams }, () => []);
-
-  /*  const distributeEquitably = (players) => {
-      while (players.length > 0) {
-        currentTeams.forEach((team) => {
-          if (players.length > 0) {
-            team.push(players.shift());
-          }
-        });
-      }
-    }; 
-
-    const distributeEquitably = (players) => {
-      let teamIndex = 0;
-      while (players.length > 0) {
-        currentTeams[teamIndex].push(players.shift())
-        teamIndex = (teamIndex + 1) % numTeams
-      }
-    }; 
-
-
-  /*  for (let i = 0; i < Math.ceil(attendes.length / teamSize); i++) {
-      currentTeams.push([]);
-    } 
-
-    distributeEquitably(levelA);
-    distributeEquitably(levelB);
-    distributeEquitably(levelC);
-
-
-    for (let [player1, player2] of restr) {
-      for (let team of currentTeams) {
-        if (
-          team.some((p) => p.name === player1) &&
-          team.some((p) => p.name === player2)
-        ) {
-          const otherTeam = currentTeams.find(
-            (t) =>
-              !t.some((p) => p.name === player1) &&
-              !t.some((p) => p.name === player2)
-          );
-          if (otherTeam) {
-            const player2obj = team.find((a) => a.name === player2);
-            team.splice(team.indexOf(player2obj), 1);
-            otherTeam.push(player2obj);
-          }
+    const distributeEqually = (levelPlayers) => {
+        let teamIndex = 0;
+        while (levelPlayers.length) {
+            const player = levelPlayers.pop(); 
+            teams[teamIndex].push(player); 
+            teamIndex = (teamIndex + 1) % totalTeams; 
         }
-      }
-    }
+    };
 
-    const remainingPlayers = attendes.length % teamSize;
-    if (remainingPlayers > 0) {
-      alert('Algunos equipos tienen jugadores adicionales debido al número de asistentes.');
-    }
+    distributeEqually(playersByLevel.A);
+    distributeEqually(playersByLevel.B);
+    distributeEqually(playersByLevel.C);
 
-    console.log("teams", currentTeams);
-    
+    const finalTeams = teams.map((team) => {
+        while (team.length < teamSizeAdjusted) {
+            const playerToMove = getPlayerToMove(teams, team);
+            if (playerToMove) {
+                team.push(playerToMove);
+            }
+        }
+        return team;
+    });
 
-    setTeam(currentTeams);
-  }; */
+    setTeam(finalTeams);
+};
+
+
+  const resetTeams = () => {
+    setTeam([])
+  }
+
+  
 
   return (
     <>
@@ -246,7 +149,18 @@ function App() {
             ))}
           </ListMembers>
 
-          <button onClick={() => teamGenerator()}>Generar equipos</button>
+          <ContainerButtons>
+            <button onClick={() => teamGenerator()}>Generar equipos</button>
+
+
+            
+            <select style={{ padding : "0.5rem", borderRadius : "10px" }} onChange={(e) => setTeamSize(parseInt(e.target.value))}>
+              <option value={6}>Seleccionar cantidad de jugadores por equipo</option>
+              <option value={5}>5</option>
+              <option value={6}>6</option>
+            </select>
+
+          </ContainerButtons>
         </div>
       )}
 

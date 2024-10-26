@@ -20,7 +20,7 @@ export const members = [
     {name :"Camila", level: "C" },
     {name :"Deiby", level: "A" },
     {name :"Milton", level: "A" },
-    {name :"Alex", level: "A" },
+    {name :"Alex", level: "B" },
     {name :"Cristian Ceballos", level: "B" },
 
 ]

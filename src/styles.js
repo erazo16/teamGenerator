@@ -60,3 +60,12 @@ export const InputStyled = styled(Input)`
   }
 
 `
+
+export const ContainerButtons = styled.div`
+    display: grid;
+    gap: 1rem;
+    grid-auto-rows: auto;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    margin: 2rem 0;
+
+`
