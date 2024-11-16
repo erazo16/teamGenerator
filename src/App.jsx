@@ -13,6 +13,7 @@ import {
 } from "./styles";
 import { ModalCreate } from "./ModalCreate";
 import { Form, Input } from "antd";
+import { shuffle } from "lodash";
 
 function App() {
   const [participants, setParticipants] = useState([]);
@@ -59,6 +60,47 @@ function App() {
   };
 
   const generateTeams = () => {
+    console.log("entra");
+    
+    if (participants.length < 10) {
+      setError('Debe haber al menos 10 jugadores');
+      return;
+    }
+
+    const perTeam = parseInt(playersPerTeam);
+    if (playersPerTeam >= participants.length) {
+      setError('El número de jugadores por equipo debe ser menor al total');
+      return;
+    }
+
+    setError('');
+
+    // Mezclar jugadores aleatoriamente
+    const shuffledPlayers = shuffle([...participants]);
+    
+    // Calcular número de equipos
+    const numberOfTeams = Math.ceil(participants.length / playersPerTeam);
+    
+    // Distribuir jugadores en equipos
+    const newTeams = [];
+    for (let i = 0; i < numberOfTeams; i++) {
+      const teamPlayers = shuffledPlayers.slice(i * playersPerTeam, (i + 1) * playersPerTeam);
+      newTeams.push(teamPlayers);
+    }
+
+    // Distribuir jugadores restantes
+    const remainingPlayers = participants.length % perTeam;
+    if (remainingPlayers > 0) {
+      const extraPlayers = shuffledPlayers.slice(-(remainingPlayers));
+      extraPlayers.forEach((player, index) => {
+        newTeams[index].push(player);
+      });
+    }
+
+    setTeams(newTeams);
+  };
+
+ /* const generateTeams = () => {
     if (participants.length < 10) {
       setError("Se requieren al menos 10 participantes");
       return;
@@ -136,7 +178,7 @@ function App() {
     setError(
       "No se pudo generar equipos balanceados después de varios intentos"
     );
-  };
+  }; */
 
   const getLevelColorClass = (level) => {
     switch (level) {
@@ -178,7 +220,7 @@ function App() {
               onChange={(e) => setParticipantName(e.target.value)}
               className="flex-1 min-w-[200px] p-2 border rounded"
             />
-            <select
+           {/* <select
               value={participantLevel}
               onChange={(e) => setParticipantLevel(e.target.value)}
               className="p-2 border rounded"
@@ -186,7 +228,7 @@ function App() {
               <option value="A">Nivel A (Alto)</option>
               <option value="B">Nivel B (Medio)</option>
               <option value="C">Nivel C (Bajo)</option>
-            </select>
+            </select>*/}
             <button
               onClick={addParticipant}
               className="bg-slate-900 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -205,7 +247,6 @@ function App() {
                     onClick={()=>  selectParticipant(item)}
                   >
                     <span className="font-medium">{item.name}</span>
-                    <span className="font-medium"> {item.level}</span>
                   </div>
                 ))}
               </div>
@@ -225,11 +266,7 @@ function App() {
                       className="flex justify-between items-center p-3 bg-gray-100 border border-gray-200 rounded"
                     >
                       <span className="font-medium">{participant.name}</span>
-                      <span
-                        className={`px-2 py-1 rounded font-bold text-black`}
-                      >
-                        Nivel {participant.level}
-                      </span>
+                     
                       <span
                         className={`px-2 py-1 rounded text-sm bg-black text-white cursor-pointer`}
                         onClick={()=> removeAttendes(participant.name)}
@@ -260,13 +297,13 @@ function App() {
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
+         {/* <div className="flex items-center gap-2">
             <span oncha>Con validacion de equidad:</span>
             <select onChange={(e)=> setValidations(e.target.value)}>
               <option value="si">Si</option>
               <option value="no">no</option>
             </select>
-          </div>
+          </div> */}
 
           <button
             onClick={generateTeams}
@@ -291,7 +328,7 @@ function App() {
               <h2 className="text-2xl font-bold mb-4">Equipos Generados</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {teams.map((team, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow p-4">
+                  <div key={index} className="bg-white rounded-lg shadow-lg border p-4">
                     <h3 className="text-lg font-bold mb-3">
                       Equipo {index + 1}
                     </h3>
@@ -302,17 +339,17 @@ function App() {
                           className="p-2 bg-gray-50 rounded flex justify-between items-center"
                         >
                           <span>{player.name}</span>
-                          <span
+                        {/*  <span
                             className={`px-2 py-1 rounded text-sm ${getLevelColorClass(
                               player.level
                             )}`}
                           >
                             Nivel {player.level}
-                          </span>
+                          </span> */}
                         </div>
                       ))}
                     </div>
-                    <div className="mt-3 flex justify-around">
+{                   /* <div className="mt-3 flex justify-around">
                       <span className="px-2 py-1 rounded text-sm bg-green-500 text-white">
                         A: {team.filter((p) => p.level === "A").length}
                       </span>
@@ -322,7 +359,7 @@ function App() {
                       <span className="px-2 py-1 rounded text-sm bg-orange-500 text-white">
                         C: {team.filter((p) => p.level === "C").length}
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 ))}
               </div>
